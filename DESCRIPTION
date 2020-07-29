@@ -20,3 +20,6 @@ URL: https://subugoe.github.io/shinycaas, https://github.com/subugoe/shinycaas
 BugReports: https://github.com/subugoe/shinycaas/issues
 Suggests:
     testthat
+Imports: 
+    processx (>= 3.4.3),
+    cli (>= 2.0.2)
