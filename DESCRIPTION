@@ -1,18 +1,22 @@
 Package: shinycaas
-Title: What the Package Does (One Line, Title Case)
+Title: Deploy shiny applications to container as a service (CaaS)
 Version: 0.0.0.9000
-Authors@R: 
+Authors@R:
     c(person(given = "Maximilian",
              family = "Held",
              role = c("aut", "cre"),
              email = "info@maxheld.de",
              comment = c(ORCID = "0000-0002-4703-5388")),
-      person(family = c(subugoe = "Göttingen State and University Library")))
-Description: What the package does (one paragraph).
+      person(given = c(subugoe = "Göttingen State and University Library"),
+             role = c("cph", "fnd"))
+    )
+Description: Deploying shiny apps to container as a service (CaaS) products on public cloud vendors.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
-URL: https://github.com/subugoe/shinycaas
+URL: https://subugoe.github.io/shinycaas, https://github.com/subugoe/shinycaas
 BugReports: https://github.com/subugoe/shinycaas/issues
+Suggests:
+    testthat
