@@ -8,7 +8,7 @@ jobs:
         shell: Rscript {0}
     container:
       # this needs to be the same as in Dockerfile
-      image: subugoe/muggle-onbuild:f60004c31979947dab53fbf9cfbb0e7f1c4bea55
+      image: subugoe/muggle-onbuild:2e75e10fc82b4c5cad586c6b6fef8b23d1b0ff04
     steps:
       - uses: actions/checkout@v2
       - name: Cache R Packages
