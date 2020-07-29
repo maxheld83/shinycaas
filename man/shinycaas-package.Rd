@@ -22,7 +22,7 @@ Useful links:
 
 Other contributors:
 \itemize{
-  \item  Göttingen State and University Library [copyright holder, funder]
+  \item Göttingen State and University Library [copyright holder, funder]
 }
 
 }
