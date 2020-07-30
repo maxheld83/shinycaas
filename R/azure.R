@@ -6,7 +6,7 @@
 #' Name of the web app.
 #'
 #' @param docker_custom_image_name
-#' The container custom image name and optionally the tag name.
+#' The custom image name and optionally the tag name.
 #' Must include everything to run the shiny app, including shiny itself.
 #' Does not need to include shiny server or other software to route, load balance and serve shiny.
 #'
