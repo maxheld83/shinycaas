@@ -24,6 +24,9 @@ Suggests:
     metar
 Imports:
     processx (>= 3.4.3),
-    cli (>= 2.0.2)
+    cli (>= 2.0.2),
+    checkmate (>= 2.0.0)
 Remotes:
     subugoe/metar@9d9a5e52fd73b9f1b90ac8055e5b8d801fbfc532
+SystemRequirements:
+  Azure CLI (>= 2.9) (https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
