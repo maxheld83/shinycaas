@@ -5,56 +5,100 @@
 #' @param name
 #' Name of the web app.
 #'
-#' @param docker_custom_image_name
+#' @param deployment_container_image_name
 #' The custom image name and optionally the tag name.
 #' Must include everything to run the shiny app, including shiny itself.
 #' Does not need to include shiny server or other software to route, load balance and serve shiny.
+#' Corresponding `Dockerfile` should include a [`RUN`](https://docs.docker.com/engine/reference/builder/#run) instruction to start shiny (recommended), or shiny can be started via the `startup_file` argument.
+#' For details on the shiny startup command, see the examples.
 #'
 #' @param startup_file
-#' Command use as an [`--entrypoint`](https://docs.docker.com/engine/reference/run/#entrypoint-default-command-to-execute-at-runtime).
+#' Command to use as a [`CMD`](https://docs.docker.com/engine/reference/run/) to `docker run` inside of `deployment_container_image_name`.
+#' Defaults to `NULL` for no `CMD`, in which case the container `deployment_container_image_name` is expected to start up shiny automatically (recommended).
+#' For details on the shiny startup command, see the examples.
+#' **Must be a string without spaces and quotes *within* arguments, i.e. `Rscript -e 1+1`, not ~~`Rscript -e "1 + 1"`~~
+#' Escaping and quoting is currently impossible ([#27](https://github.com/subugoe/shinycaas/issues/27))**.
+#'
+#' @param plan
+#' Name or resource id of the app service plan.
+#'
+#' @param resource_group
+#' The [Azure resource group](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/manage-resource-groups-portal) to which the shiny app should belong.
 #'
 #' @param subscription
 #' Name or ID of the Azure subscription to which costs are billed.
 #' According to an upvoted answer on Stack Overflow, [Azure subscription IDs need not be considered a secret or personal identifiable information (PII)](https://stackoverflow.com/questions/45661109/are-azure-subscription-id-aad-tenant-id-and-aad-app-client-id-considered-secre).
 #' However, depending your applicable context and policies, you may want to provide this argument as a secret.
 #'
-#' @param resource_group
-#' The [Azure resource group](https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/manage-resource-groups-portal) to which the shiny app should belong.
-#'
 #' @param docker_registry_server_url
 #' The container registry server url.
+#' Defaults to `NULL`, in which case the azure default, [docker hub](http://hub.docker.com) is used.
 #'
-#' @param docker_registry_server_user
-#' The container registry server username.
+#' @param docker_registry_server_user,docker_registry_server_password
+#' Credentials for private container registries.
+#' Defaults to `NULL` for public registries.
+#' Do not expose your credentials in public code; it's best to use secret environment variables.
+#'
+#' @example tests/testthat/setup-azure.R
 #'
 #' @export
-az_webapp_config <- function(name = "hoad",
-                             docker_custom_image_name = paste0(
-                               "docker.pkg.github.com/subugoe/hoad/hoad-dev",
-                               ":",
-                               "azure"
-                             ),
-                             startup_file = "init.sh",
-                             subscription = "f0dd3a37-0a4e-4e7f-9c9b-cb9f60146edc",
-                             resource_group = "hoad",
-                             docker_registry_server_url = "https://docker.pkg.github.com",
-                             docker_registry_server_user = "maxheld83") {
+az_webapp_config <- function(name,
+                             deployment_container_image_name,
+                             startup_file = NULL,
+                             plan,
+                             resource_group,
+                             subscription,
+                             docker_registry_server_url = NULL,
+                             docker_registry_server_user = NULL,
+                             docker_registry_server_password = NULL) {
   checkmate::assert_string(name)
-  checkmate::assert_string(docker_custom_image_name)
-  checkmate::assert_string(startup_file)
+  checkmate::assert_string(deployment_container_image_name)
+  checkmate::assert_string(startup_file, )
   checkmate::assert_string(subscription)
   checkmate::assert_string(resource_group)
-  checkmate::assert_string(docker_registry_server_url)
-  checkmate::assert_string(docker_registry_server_user)
-
+  checkmate::assert_string(docker_registry_server_url, null.ok = TRUE)
+  checkmate::assert_string(docker_registry_server_user, null.ok = TRUE)
+  checkmate::assert_string(docker_registry_server_password, null.ok = TRUE)
 
   cli::cli_alert_info("Setting defaults ...")
+  # unclear where those are set
   az_cli_run(args = c("account", "set", "--subscription", subscription))
+  # precaution against ambiguous credentials and later cleanup deletion
+  if (fs::dir_exists(".azure")) {
+    usethis::ui_stop(
+      "There is a folder {usethis::ui_path('.azure')} at the working directory.
+      It may already contain defaults.
+      Delete it to proceed."
+    )
+  }
   az_cli_run(args = c(
     "configure",
     # only applies to current folder, useful if there are various projects
     "--scope", "local",
     "--defaults", paste0("group=", resource_group), paste0("web=", name)
+  ))
+  # cleaner not to let defaults linger
+  withr::defer(fs::dir_delete(".azure"))
+
+  cli::cli_alert_info("Creating or updating web app ...")
+  az_cli_run(args = c(
+    "webapp", "create",
+    "--name", name,
+    "--plan", plan,
+    "--deployment-container-image-name", deployment_container_image_name,
+    if (!is.null(docker_registry_server_url)) {
+      c("--docker-registry-server-url", docker_registry_server_url)
+    },
+    if (!is.null(docker_registry_server_user)) {
+      c("--docker-registry-server-user", docker_registry_server_user)
+    },
+    if (!is.null(docker_registry_server_password)) {
+      c("--docker-registry-server-password", docker_registry_server_password)
+    },
+    if (!is.null(startup_file)) {
+      c("--startup-file", startup_file)
+    }
+    # todo also pass on tags #25
   ))
 
   cli::cli_alert_info("Setting web app tags ...")
@@ -71,18 +115,9 @@ az_webapp_config <- function(name = "hoad",
     "--always-on", "true",
     "--ftps-state", "disabled", # not needed
     "--web-sockets-enabled", "true", # needed to serve shiny
-    "--http20-enabled", "false",
-    "--startup-file", "init.sh"
+    "--http20-enabled", "false"
   ))
 
-  cli::cli_alert_info("Setting container configuration ...")
-  az_cli_run(args = c(
-    "webapp", "config", "container", "set",
-    "--docker-custom-image-name", docker_custom_image_name,
-    "--docker-registry-server-url", docker_registry_server_url,
-    "--docker-registry-server-user", docker_registry_server_user,
-    "--enable-app-service-storage", "false"
-  ))
   # weirdly this cannot be set in the above
   az_cli_run(args = c(
     "webapp", "config", "appsettings", "set",

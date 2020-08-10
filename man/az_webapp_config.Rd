@@ -5,35 +5,72 @@
 \title{Run a shiny app on \href{https://azure.microsoft.com/en-us/services/app-service/containers/}{Microsoft Azure Web Apps for Containers} (awac)}
 \usage{
 az_webapp_config(
-  name = "hoad",
-  docker_custom_image_name = paste0("docker.pkg.github.com/subugoe/hoad/hoad-dev", ":",
-    "azure"),
-  startup_file = "init.sh",
-  subscription = "f0dd3a37-0a4e-4e7f-9c9b-cb9f60146edc",
-  resource_group = "hoad",
-  docker_registry_server_url = "https://docker.pkg.github.com",
-  docker_registry_server_user = "maxheld83"
+  name,
+  deployment_container_image_name,
+  startup_file = NULL,
+  plan,
+  resource_group,
+  subscription,
+  docker_registry_server_url = NULL,
+  docker_registry_server_user = NULL,
+  docker_registry_server_password = NULL
 )
 }
 \arguments{
 \item{name}{Name of the web app.}
 
-\item{docker_custom_image_name}{The custom image name and optionally the tag name.
+\item{deployment_container_image_name}{The custom image name and optionally the tag name.
 Must include everything to run the shiny app, including shiny itself.
-Does not need to include shiny server or other software to route, load balance and serve shiny.}
+Does not need to include shiny server or other software to route, load balance and serve shiny.
+Corresponding \code{Dockerfile} should include a \href{https://docs.docker.com/engine/reference/builder/#run}{\code{RUN}} instruction to start shiny (recommended), or shiny can be started via the \code{startup_file} argument.
+For details on the shiny startup command, see the examples.}
 
-\item{startup_file}{Command use as an \href{https://docs.docker.com/engine/reference/run/#entrypoint-default-command-to-execute-at-runtime}{\code{--entrypoint}}.}
+\item{startup_file}{Command to use as a \href{https://docs.docker.com/engine/reference/run/}{\code{CMD}} to \verb{docker run} inside of \code{deployment_container_image_name}.
+Defaults to \code{NULL} for no \code{CMD}, in which case the container \code{deployment_container_image_name} is expected to start up shiny automatically (recommended).
+For details on the shiny startup command, see the examples.
+\strong{Must be a string without spaces and quotes \emph{within} arguments, i.e. \verb{Rscript -e 1+1}, not ~~\verb{Rscript -e "1 + 1"}~~
+Escaping and quoting is currently impossible (\href{https://github.com/subugoe/shinycaas/issues/27}{#27})}.}
+
+\item{plan}{Name or resource id of the app service plan.}
+
+\item{resource_group}{The \href{https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/manage-resource-groups-portal}{Azure resource group} to which the shiny app should belong.}
 
 \item{subscription}{Name or ID of the Azure subscription to which costs are billed.
 According to an upvoted answer on Stack Overflow, \href{https://stackoverflow.com/questions/45661109/are-azure-subscription-id-aad-tenant-id-and-aad-app-client-id-considered-secre}{Azure subscription IDs need not be considered a secret or personal identifiable information (PII)}.
 However, depending your applicable context and policies, you may want to provide this argument as a secret.}
 
-\item{resource_group}{The \href{https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/manage-resource-groups-portal}{Azure resource group} to which the shiny app should belong.}
+\item{docker_registry_server_url}{The container registry server url.
+Defaults to \code{NULL}, in which case the azure default, \href{http://hub.docker.com}{docker hub} is used.}
 
-\item{docker_registry_server_url}{The container registry server url.}
-
-\item{docker_registry_server_user}{The container registry server username.}
+\item{docker_registry_server_user, docker_registry_server_password}{Credentials for private container registries.
+Defaults to \code{NULL} for public registries.
+Do not expose your credentials in public code; it's best to use secret environment variables.}
 }
 \description{
 Wraps the \href{https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest}{Azure Command-Line Interface (CLI)} with defaults suitable for deploying a shiny app.
+}
+\examples{
+# deploy shiny app using rocker image
+#' \dontrun{
+az_webapp_config(
+  name = "hello-shiny",
+  # this image includes *more* than necessary
+  # for example, it includes shinyserver, but just shiny would suffice
+  deployment_container_image_name = "rocker/shiny:4.0.2",
+  # above image includes no suitable default `RUN`
+  # so this `[COMMAND]` must be appended to `docker run`
+  startup_file = paste0(
+    "Rscript -e ",
+    # no more spaces from now on
+    "shiny::runExample('01_hello',", # shiny example app
+    "host='0.0.0.0',", # necessary to let azure talk to container
+    "port=as.integer(Sys.getenv('PORT')))" # env var set by azure
+  ),
+  # replace below with your own credentials
+  plan = "hoad",
+  resource_group = "hoad",
+  # this is the subugoe subscription used for testing
+  subscription = "f0dd3a37-0a4e-4e7f-9c9b-cb9f60146edc"
+)
+#' }
 }
