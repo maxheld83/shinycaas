@@ -2,7 +2,8 @@
 % Please edit documentation in R/azure.R
 \name{az_webapp_config}
 \alias{az_webapp_config}
-\title{Run a shiny app on \href{https://azure.microsoft.com/en-us/services/app-service/containers/}{Microsoft Azure Web Apps for Containers} (awac)}
+\alias{az_webapp_shiny_opts}
+\title{Deploy a shiny app to \href{https://azure.microsoft.com/en-us/services/app-service/containers/}{Microsoft Azure Web Apps for Containers}}
 \usage{
 az_webapp_config(
   name,
@@ -15,21 +16,36 @@ az_webapp_config(
   docker_registry_server_user = NULL,
   docker_registry_server_password = NULL
 )
+
+az_webapp_shiny_opts()
 }
 \arguments{
 \item{name}{Name of the web app.}
 
 \item{deployment_container_image_name}{The custom image name and optionally the tag name.
-Must include everything to run the shiny app, including shiny itself.
-Does not need to include shiny server or other software to route, load balance and serve shiny.
-Corresponding \code{Dockerfile} should include a \href{https://docs.docker.com/engine/reference/builder/#run}{\code{RUN}} instruction to start shiny (recommended), or shiny can be started via the \code{startup_file} argument.
-For details on the shiny startup command, see the examples.}
+Image must
+\itemize{
+\item include everything needed to run the shiny app, including shiny itself,
+but \emph{does not} need to include shiny server or other software to route, load balance and serve shiny,
+\item include an \code{ENTRYPOINT} and/or \href{https://docs.docker.com/engine/reference/builder/#cmd}{\code{CMD}} instruction to start shiny automatically (recommended), \emph{or} shiny must be started via the \code{startup_file} argument.
+}}
 
-\item{startup_file}{Command to use as a \href{https://docs.docker.com/engine/reference/run/}{\code{CMD}} to \verb{docker run} inside of \code{deployment_container_image_name}.
-Defaults to \code{NULL} for no \code{CMD}, in which case the container \code{deployment_container_image_name} is expected to start up shiny automatically (recommended).
+\item{startup_file}{\verb{docker run} \href{https://docs.docker.com/engine/reference/run/}{\verb{[COMMAND]}} to use inside of your custom image \code{deployment_container_image_name}.
+Defaults to \code{NULL}, in which case the container is expected to start up shiny automatically (recommended).
 For details on the shiny startup command, see the examples.
-\strong{Must be a string without spaces and quotes \emph{within} arguments, i.e. \verb{Rscript -e 1+1}, not ~~\verb{Rscript -e "1 + 1"}~~
-Escaping and quoting is currently impossible (\href{https://github.com/subugoe/shinycaas/issues/27}{#27})}.}
+
+\strong{The \verb{[EXPR]} (anything after \code{-e}) must not be quoted, and must not contain spaces (\href{https://github.com/subugoe/shinycaas/issues/27}{#27})}.
+For example, the following \code{startup-file}s are valid (if nonsensical, because they don't start a shiny app)
+\itemize{
+\item \code{"Rscript -e 1+1"} (no spaces)
+\item \code{"Rscript -e print('foo')"} (no spaces, no quoting \emph{of} the \verb{[EXPR]})
+}
+
+The following \code{startup-file}s are \emph{invalid}:
+\itemize{
+\item \code{"Rscript -e 1 + 1"} (spaces inside \verb{[EXPR]})
+\item \code{"Rscript -e '1+1'"} (quoting of \verb{[EXPR]} would be treated as \verb{"Rscript -e '\\"1+1\\"'"}).
+}}
 
 \item{plan}{Name or resource id of the app service plan.}
 
@@ -49,28 +65,38 @@ Do not expose your credentials in public code; it's best to use secret environme
 \description{
 Wraps the \href{https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest}{Azure Command-Line Interface (CLI)} with defaults suitable for deploying a shiny app.
 }
+\section{Functions}{
+\itemize{
+\item \code{az_webapp_shiny_opts}: Set shiny options as \href{https://docs.microsoft.com/en-us/azure/app-service/containers/configure-custom-container}{required for an Azure Webapp}:
+\itemize{
+\item \verb{options(shiny.port = as.integer(Sys.getenv('PORT'))}.
+Your custom container is expected to listen on \code{PORT}, an environment variable set by Azure.
+If your image suggests \code{EXPOSE}d ports, that may be respected by Azure (undocumented behavior).
+\item \code{options(shiny.host = "0.0.0.0")} to make your shiny application accessable to the Azure Webapp hosting environment.
+}
+
+You can also set these options manually as in the below example.
+}}
+
 \examples{
 # deploy shiny app using rocker image
-#' \dontrun{
 az_webapp_config(
   name = "hello-shiny",
-  # this image includes *more* than necessary
+  # this image actually includes *more* than necessary
   # for example, it includes shinyserver, but just shiny would suffice
   deployment_container_image_name = "rocker/shiny:4.0.2",
-  # above image includes no suitable default `RUN`
+  # above image has no `ENTRYPOINT` and/or `CMD` to start shiny by default.
   # so this `[COMMAND]` must be appended to `docker run`
-  startup_file = paste0(
-    "Rscript -e ",
-    # no more spaces from now on
-    "shiny::runExample('01_hello',", # shiny example app
-    "host='0.0.0.0',", # necessary to let azure talk to container
-    "port=as.integer(Sys.getenv('PORT')))" # env var set by azure
+  startup_file = paste(
+    "Rscript ",
+    # setting shiny options for azure manually
+    # equivalent to running shinycaas::az_webapp_shiny_opts()
+    "-e options(shiny.host='0.0.0.0',shiny.port=as.integer(Sys.getenv('PORT')",
+    "-e shiny::runExample('01_hello')"
   ),
   # replace below with your own credentials
   plan = "hoad",
   resource_group = "hoad",
-  # this is the subugoe subscription used for testing
   subscription = "f0dd3a37-0a4e-4e7f-9c9b-cb9f60146edc"
 )
-#' }
 }

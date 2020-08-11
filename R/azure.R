@@ -1,4 +1,4 @@
-#' Run a shiny app on [Microsoft Azure Web Apps for Containers](https://azure.microsoft.com/en-us/services/app-service/containers/) (awac)
+#' Deploy a shiny app to [Microsoft Azure Web Apps for Containers](https://azure.microsoft.com/en-us/services/app-service/containers/)
 #'
 #' Wraps the [Azure Command-Line Interface (CLI)](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest) with defaults suitable for deploying a shiny app.
 #'
@@ -7,17 +7,24 @@
 #'
 #' @param deployment_container_image_name
 #' The custom image name and optionally the tag name.
-#' Must include everything to run the shiny app, including shiny itself.
-#' Does not need to include shiny server or other software to route, load balance and serve shiny.
-#' Corresponding `Dockerfile` should include a [`RUN`](https://docs.docker.com/engine/reference/builder/#run) instruction to start shiny (recommended), or shiny can be started via the `startup_file` argument.
-#' For details on the shiny startup command, see the examples.
+#' Image must
+#' - include everything needed to run the shiny app, including shiny itself,
+#'   but *does not* need to include shiny server or other software to route, load balance and serve shiny,
+#' - include an `ENTRYPOINT` and/or [`CMD`](https://docs.docker.com/engine/reference/builder/#cmd) instruction to start shiny automatically (recommended), *or* shiny must be started via the `startup_file` argument.
 #'
 #' @param startup_file
-#' Command to use as a [`CMD`](https://docs.docker.com/engine/reference/run/) to `docker run` inside of `deployment_container_image_name`.
-#' Defaults to `NULL` for no `CMD`, in which case the container `deployment_container_image_name` is expected to start up shiny automatically (recommended).
+#' `docker run` [`[COMMAND]`](https://docs.docker.com/engine/reference/run/) to use inside of your custom image `deployment_container_image_name`.
+#' Defaults to `NULL`, in which case the container is expected to start up shiny automatically (recommended).
 #' For details on the shiny startup command, see the examples.
-#' **Must be a string without spaces and quotes *within* arguments, i.e. `Rscript -e 1+1`, not ~~`Rscript -e "1 + 1"`~~
-#' Escaping and quoting is currently impossible ([#27](https://github.com/subugoe/shinycaas/issues/27))**.
+#'
+#' **The `[EXPR]` (anything after `-e`) must not be quoted, and must not contain spaces ([#27](https://github.com/subugoe/shinycaas/issues/27))**.
+#' For example, the following `startup-file`s are valid (if nonsensical, because they don't start a shiny app)
+#' - `"Rscript -e 1+1"` (no spaces)
+#' - `"Rscript -e print('foo')"` (no spaces, no quoting *of* the `[EXPR]`)
+#'
+#' The following `startup-file`s are *invalid*:
+#' - `"Rscript -e 1 + 1"` (spaces inside `[EXPR]`)
+#' - `"Rscript -e '1+1'"` (quoting of `[EXPR]` would be treated as `"Rscript -e '\"1+1\"'"`).
 #'
 #' @param plan
 #' Name or resource id of the app service plan.
@@ -77,7 +84,7 @@ az_webapp_config <- function(name,
     "--scope", "local",
     "--defaults", paste0("group=", resource_group), paste0("web=", name)
   ))
-  # cleaner not to let defaults linger
+  # clean up not to let defaults linger
   withr::defer(fs::dir_delete(".azure"))
 
   cli::cli_alert_info("Creating or updating web app ...")
@@ -146,4 +153,32 @@ az_cli_run <- function(...) {
     echo = TRUE,
     ...
   )
+}
+
+#' @describeIn az_webapp_config
+#' Set shiny options as [required for an Azure Webapp](https://docs.microsoft.com/en-us/azure/app-service/containers/configure-custom-container):
+#' - `options(shiny.port = as.integer(Sys.getenv('PORT'))`.
+#'    Your custom container is expected to listen on `PORT`, an environment variable set by Azure.
+#'    If your image suggests `EXPOSE`d ports, that may be respected by Azure (undocumented behavior).
+#' - `options(shiny.host = "0.0.0.0")` to make your shiny application accessable to the Azure Webapp hosting environment.
+#'
+#' You can also set these options manually as in the below example.
+az_webapp_shiny_opts <- function() {
+  port <- Sys.getenv("PORT")
+  if (port == "") {
+    cli::cli_alert_warning(
+      "Could not find environment variable {cli::cli_code('PORT')}.",
+      "Perhaps this is running outside of Azure?",
+      "Reverting to shiny default."
+    )
+    port <- NULL
+  } else {
+    port <- as.integer(port)
+  }
+  old_opts <- options(
+    shiny.port = port, # defined on azure
+    shiny.host = "0.0.0.0" # to five azure access to inner container
+  )
+  # TODO might revert back to old_opts with
+  # withr::defer(options(old_opts), envir = parent.frame(2))
 }
