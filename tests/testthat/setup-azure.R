@@ -10,7 +10,7 @@ az_webapp_config(
     "Rscript ",
     # setting shiny options for azure manually
     # equivalent to running shinycaas::az_webapp_shiny_opts()
-    "-e options(shiny.host='0.0.0.0',shiny.port=as.integer(Sys.getenv('PORT')",
+    "-e options(shiny.host='0.0.0.0',shiny.port=as.integer(Sys.getenv('PORT'))",
     "-e shiny::runExample('01_hello')"
   ),
   # replace below with your own credentials
