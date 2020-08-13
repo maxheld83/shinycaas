@@ -163,6 +163,8 @@ az_cli_run <- function(...) {
 #' - `options(shiny.host = "0.0.0.0")` to make your shiny application accessable to the Azure Webapp hosting environment.
 #'
 #' You can also set these options manually as in the below example.
+#'
+#' @export
 az_webapp_shiny_opts <- function() {
   port <- Sys.getenv("PORT")
   if (port == "") {

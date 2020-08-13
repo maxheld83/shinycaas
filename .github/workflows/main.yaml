@@ -8,7 +8,7 @@ jobs:
         shell: Rscript {0}
     container:
       # this needs to be the same as in Dockerfile
-      image: subugoe/muggle-onbuild:2e75e10fc82b4c5cad586c6b6fef8b23d1b0ff04
+      image: subugoe/muggle-buildtime-onbuild:a94fcb785886af96d440b4bcd7f47c01162d7f5e
     steps:
       - uses: actions/checkout@v2
       - name: Cache R Packages
@@ -17,11 +17,6 @@ jobs:
           # only cache the user library
           path: ".github/library"
           key: ${{ job.container.image }}-${{ hashFiles('DESCRIPTION') }}
-      - name: Install Azure CLI
-        # nonstandard muggle, duplicated in dockerfile
-        # TODO remove this https://github.com/subugoe/shinycaas/issues/32
-        run: curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-        shell: bash
       - name: Log in to Azure
         uses: azure/login@v1.1
         with:
@@ -31,8 +26,25 @@ jobs:
       - name: Install R Dependencies
         env:
           # see builder.Dockerfile for explanation, this resets after this step
-          R_LIBS_SITE: $R_LIBS_APP_GH
+          R_LIBS_SITE: $R_LIBS_RUNTIME_GH
         run: remotes::install_deps(dependencies = TRUE)
+      # this step is out of whack in this package, because below checks need image ready
+      - name: Build Runtime Image
+        uses: docker/build-push-action@v1
+        with:
+          # not called runtime as usual, because this is just testing
+          repository: ${{ github.repository }}/oldfaithful
+          target: runtime
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          # this will set "latest" if master as per https://github.com/docker/build-push-action
+          tag_with_ref: true
+          # we're relying on long shas only to keep things easy
+          tag_with_sha: false
+          tags: ${{ github.sha }}
+          add_git_labels: true
+          push: ${{ github.event_name != 'pull_request' }}
       - name: Check
         run: muggle::rcmdcheck2()
       - name: Test Coverage
@@ -40,9 +52,10 @@ jobs:
       - name: Build Package Website
         run: pkgdown::build_site(override = list(new_process = FALSE))
       - uses: docker/build-push-action@v1
-        name: Build Dev Image
+        name: Build Buildtime Image
         with:
-          repository: ${{ github.repository }}/shinycaas-dev
+          repository: ${{ github.repository }}/shinycaas-buildtime
+          target: buildtime
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com

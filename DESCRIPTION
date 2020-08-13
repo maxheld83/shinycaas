@@ -21,7 +21,7 @@ BugReports: https://github.com/subugoe/shinycaas/issues
 Suggests:
     testthat,
     shiny (>= 1.5.0),
-    metar
+    subugoetheme
 Imports:
     processx (>= 3.4.3),
     cli (>= 2.0.2),
@@ -30,6 +30,6 @@ Imports:
     fs (>= 1.4.0),
     usethis (>= 1.6.1)
 Remotes:
-    subugoe/metar@9d9a5e52fd73b9f1b90ac8055e5b8d801fbfc532
+  subugoe/subugoetheme@1.0.0
 SystemRequirements:
   Azure CLI (>= 2.9) (https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
