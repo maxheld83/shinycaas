@@ -27,7 +27,9 @@ jobs:
         env:
           # see builder.Dockerfile for explanation, this resets after this step
           R_LIBS_SITE: $R_LIBS_RUNTIME_GH
-        run: remotes::install_deps(dependencies = TRUE)
+        run: |
+          remotes::install_deps(dependencies = TRUE)
+          remotes::install_deps(dependencies = "Website")
       # this step is out of whack in this package, because below checks need image ready
       - name: Build Runtime Image
         uses: docker/build-push-action@v1
