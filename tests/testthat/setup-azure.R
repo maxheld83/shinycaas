@@ -11,7 +11,8 @@ az_webapp_config(
     # setting shiny options for azure manually
     # equivalent to running shinycaas::az_webapp_shiny_opts()
     "-e options(shiny.host='0.0.0.0',shiny.port=as.integer(Sys.getenv('PORT')))",
-    "-e shiny::runExample('01_hello')"
+    # weirdly, runExample does not take port option by default until https://github.com/rstudio/shiny/issues/2972 is on CRAN
+    "-e shiny::runExample('01_hello',port=getOption('shiny.port'))"
   ),
   # replace below with your own credentials
   plan = "hoad",
