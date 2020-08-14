@@ -7,7 +7,7 @@ az_webapp_config(
   # above image has no `ENTRYPOINT` and/or `CMD` to start shiny by default.
   # so this `[COMMAND]` must be appended to `docker run`
   startup_file = paste(
-    "Rscript ",
+    "Rscript",
     # setting shiny options for azure manually
     # equivalent to running shinycaas::az_webapp_shiny_opts()
     "-e options(shiny.host='0.0.0.0',shiny.port=as.integer(Sys.getenv('PORT')))",
