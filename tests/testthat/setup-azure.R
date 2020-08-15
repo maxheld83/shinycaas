@@ -12,7 +12,7 @@ az_webapp_config(
     # equivalent to running shinycaas::az_webapp_shiny_opts()
     "-e options(shiny.host='0.0.0.0',shiny.port=as.integer(Sys.getenv('PORT')))",
     # remove getOption call https://github.com/subugoe/shinycaas/issues/37
-    "-e shiny::runExample('02_text',port=getOption('shiny.port'))"
+    "-e shiny::runExample('01_hello',port=getOption('shiny.port'))"
   ),
   # replace below with your own credentials
   plan = "hoad",
