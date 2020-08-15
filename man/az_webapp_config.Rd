@@ -14,7 +14,8 @@ az_webapp_config(
   subscription,
   docker_registry_server_url = NULL,
   docker_registry_server_user = NULL,
-  docker_registry_server_password = NULL
+  docker_registry_server_password = NULL,
+  restart = FALSE
 )
 
 az_webapp_shiny_opts()
@@ -61,6 +62,8 @@ Defaults to \code{NULL}, in which case the azure default, \href{http://hub.docke
 \item{docker_registry_server_user, docker_registry_server_password}{Credentials for private container registries.
 Defaults to \code{NULL} for public registries.
 Do not expose your credentials in public code; it's best to use secret environment variables.}
+
+\item{restart}{whether to restart the web app.}
 }
 \description{
 Wraps the \href{https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest}{Azure Command-Line Interface (CLI)} with defaults suitable for deploying a shiny app.
@@ -92,9 +95,8 @@ az_webapp_config(
     # setting shiny options for azure manually
     # equivalent to running shinycaas::az_webapp_shiny_opts()
     "-e options(shiny.host='0.0.0.0',shiny.port=as.integer(Sys.getenv('PORT')))",
-    # runExample does not take port option by default until
-    # https://github.com/rstudio/shiny/issues/2972 is on CRAN
-    "-e shiny::runExample('01_hello',port=getOption('shiny.port'))"
+    # remove getOption call https://github.com/subugoe/shinycaas/issues/37
+    "-e shiny::runExample('02_text',port=getOption('shiny.port'))"
   ),
   # replace below with your own credentials
   plan = "hoad",

@@ -46,6 +46,8 @@
 #' Defaults to `NULL` for public registries.
 #' Do not expose your credentials in public code; it's best to use secret environment variables.
 #'
+#' @param restart whether to restart the web app.
+#'
 #' @example tests/testthat/setup-azure.R
 #'
 #' @export
@@ -57,7 +59,8 @@ az_webapp_config <- function(name,
                              subscription,
                              docker_registry_server_url = NULL,
                              docker_registry_server_user = NULL,
-                             docker_registry_server_password = NULL) {
+                             docker_registry_server_password = NULL,
+                             restart = FALSE) {
   checkmate::assert_string(name)
   checkmate::assert_string(deployment_container_image_name)
   checkmate::assert_string(startup_file, )
@@ -132,10 +135,11 @@ az_webapp_config <- function(name,
   ))
 
   cli::cli_alert_info("Restaring web app ...")
-  # TODO might not be necessary #20
-  az_cli_run(args = c(
-    "webapp", "restart"
-  ))
+  if (restart) {
+    az_cli_run(args = c(
+      "webapp", "restart"
+    ))
+  }
 
   # TODO check whether app actually runs #22
 }
