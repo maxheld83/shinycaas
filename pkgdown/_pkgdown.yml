@@ -6,3 +6,10 @@ authors:
     href: https://www.sub.uni-goettingen.de/
 template:
   package: subugoetheme
+articles:
+- title: Example Apps
+  navbar: Example Apps
+  description: Shiny apps used for testing.
+  contents:
+  - hello-shiny
+  - old-faithful
