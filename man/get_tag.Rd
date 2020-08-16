@@ -10,7 +10,7 @@ get_tag()
 character string
 }
 \description{
-Retrieves the current git commit SHA from the \href{https://docs.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions}{\code{github.sha}} environment variable set on GitHub Actions.
+Retrieves the current git commit SHA from the \href{https://docs.github.com/en/actions/configuring-and-managing-workflows/using-environment-variables}{\code{GITHUB_SHA}} environment variable set on GitHub Actions.
 Returns \code{latest}, if the environment variable is an empty string.
 Internal function used to retrieve the appropriate docker image tag for a shiny app.
 }
