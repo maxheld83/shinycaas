@@ -26,6 +26,6 @@ footer{
 </style>
 
 <div class="shiny-app-frame">
-<iframe src="http://hello-shiny.azurewebsites.net">
+<iframe src="https://hello-shiny.azurewebsites.net">
 </iframe>
 </div>
