@@ -63,7 +63,7 @@ az_webapp_config <- function(name,
                              restart = FALSE) {
   checkmate::assert_string(name)
   checkmate::assert_string(deployment_container_image_name)
-  checkmate::assert_string(startup_file, )
+  checkmate::assert_string(startup_file, null.ok = TRUE)
   checkmate::assert_string(subscription)
   checkmate::assert_string(resource_group)
   checkmate::assert_string(docker_registry_server_url, null.ok = TRUE)
@@ -95,7 +95,21 @@ az_webapp_config <- function(name,
     "webapp", "create",
     "--name", name,
     "--plan", plan,
+    # az webapp create, though undocumented, requires either an image name or a runtime
+    # other container settings are set below
     "--deployment-container-image-name", deployment_container_image_name,
+    if (!is.null(startup_file)) {
+      c("--startup-file", startup_file)
+    }
+    # todo also pass on tags #25
+  ))
+
+  cli::cli_alert_info("Setting web app container settings")
+  az_cli_run(args = c(
+    "webapp", "config", "container", "set",
+    # redundant, container is already set above, but safer\
+    # otherwise command might be called with no args
+    "--docker-custom-image-name", deployment_container_image_name,
     if (!is.null(docker_registry_server_url)) {
       c("--docker-registry-server-url", docker_registry_server_url)
     },
@@ -104,11 +118,7 @@ az_webapp_config <- function(name,
     },
     if (!is.null(docker_registry_server_password)) {
       c("--docker-registry-server-password", docker_registry_server_password)
-    },
-    if (!is.null(startup_file)) {
-      c("--startup-file", startup_file)
     }
-    # todo also pass on tags #25
   ))
 
   cli::cli_alert_info("Setting web app tags ...")

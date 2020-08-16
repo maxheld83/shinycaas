@@ -2,4 +2,5 @@
 
 export(az_webapp_config)
 export(az_webapp_shiny_opts)
+export(get_tag)
 export(runOldFaithful)

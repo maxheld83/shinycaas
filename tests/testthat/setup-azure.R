@@ -1,3 +1,9 @@
+# hoad credentials used for testing
+# authentication happens outside of r, see github actions main.yaml
+plan <- "hoad"
+resource_group <- "hoad"
+subscription <- "f0dd3a37-0a4e-4e7f-9c9b-cb9f60146edc"
+
 # deploy shiny app using rocker image
 az_webapp_config(
   name = "hello-shiny",
@@ -15,18 +21,22 @@ az_webapp_config(
     "-e shiny::runExample('01_hello',port=getOption('shiny.port'))"
   ),
   # replace below with your own credentials
-  plan = "hoad",
-  resource_group = "hoad",
-  subscription = "f0dd3a37-0a4e-4e7f-9c9b-cb9f60146edc"
+  plan = plan,
+  resource_group = resource_group,
+  subscription = subscription
 )
 
 # deploy shiny app using muggle image
-# az_webapp_config(
-#   name = "old-faithful",
-#   deployment_container_image_name = "docker.pkg.github.com/subugoe/shinycaas/oldfaithful",
-#   plan = "hoad",
-#   resource_group = "hoad",
-#   subscription = "f0dd3a37-0a4e-4e7f-9c9b-cb9f60146edc",
-#   docker_registry_server_url = "https://docker.pkg.github.com",
-#   docker_registry_server_user = "maxheld83"
-# )
+az_webapp_config(
+  name = "old-faithful",
+  deployment_container_image_name = paste0(
+    "docker.pkg.github.com/subugoe/shinycaas/oldfaithful:",
+    get_tag()
+  ),
+  plan = plan,
+  resource_group = resource_group,
+  subscription = subscription,
+  docker_registry_server_url = "https://docker.pkg.github.com",
+  docker_registry_server_user = "maxheld83"
+  # docker password is a GITHUB PAT, pasted directly into portal.azure.com
+)
