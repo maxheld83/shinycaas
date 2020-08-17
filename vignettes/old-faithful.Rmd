@@ -2,30 +2,6 @@
 title: "old-faithful"
 ---
 
-<style>
-.shiny-app-frame {
-  margin-top: 50px;
-  position: fixed;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  right: 0;
-}
-.shiny-app-frame iframe {
-  width: 100%;
-  height: 100%;
-  border: none;
-}
-/* must be hidden otherwise it gets overlaid over the app */
-footer{
-  visibility: hidden
-}
-.page-header{
-  visibility: hidden
-}
-</style>
-
-<div class="shiny-app-frame">
-<iframe src="https://old-faithful.azurewebsites.net">
-</iframe>
-</div>
+```{r echo=FALSE}
+shinycaas::include_app2("https://old-faithful.azurewebsites.net")
+```
