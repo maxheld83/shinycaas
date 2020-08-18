@@ -14,7 +14,7 @@ include_app2(src, name = NULL, height = "100\%", width = "100\%")
 \item{height, width}{The dimensions of the iframe as CSS units.}
 }
 \value{
-A tag list as from \code{\link[htmltools:tag]{htmltools::tagList()}}
+A tag list as from \code{\link[htmltools:tag]{htmltools::tagList()}}.
 }
 \description{
 Embeds a shiny app in a pkgdown, or similar bootstrap website.

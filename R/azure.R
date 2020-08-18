@@ -126,7 +126,7 @@ az_webapp_config <- function(name,
   az_cli_run(args = c(
     "webapp", "update",
     "--client-affinity-enabled", "true", # send traffic to same machine
-    "--https-only", "false" # TODO #3
+    "--https-only", "true"
   ))
 
   cli::cli_alert_info("Setting web app configuration ...")
@@ -135,7 +135,8 @@ az_webapp_config <- function(name,
     "--always-on", "true",
     "--ftps-state", "disabled", # not needed
     "--web-sockets-enabled", "true", # needed to serve shiny
-    "--http20-enabled", "false"
+    "--http20-enabled", "false",
+    "--min-tls-version", "1.2"
   ))
 
   # weirdly this cannot be set in the above
