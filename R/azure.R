@@ -135,7 +135,7 @@ az_webapp_config <- function(name,
     "--always-on", "true",
     "--ftps-state", "disabled", # not needed
     "--web-sockets-enabled", "true", # needed to serve shiny
-    "--http20-enabled", "false",
+    "--http20-enabled", "true",
     "--min-tls-version", "1.2"
   ))
 
