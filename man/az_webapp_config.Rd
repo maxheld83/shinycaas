@@ -111,11 +111,12 @@ az_webapp_config(
 )
 
 # deploy shiny app using muggle image
+# for an easier way to set these arguments, see the {muggle} package
 az_webapp_config(
   name = "old-faithful",
   deployment_container_image_name = paste0(
-    "docker.pkg.github.com/subugoe/shinycaas/oldfaithful:",
-    get_tag()
+    "docker.pkg.github.com/subugoe/shinycaas/oldfaithful", ":",
+    ifelse(Sys.getenv("GITHUB_SHA") == "", "latest", Sys.getenv("GITHUB_SHA"))
   ),
   plan = plan,
   resource_group = resource_group,
