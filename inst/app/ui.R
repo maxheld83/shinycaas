@@ -1,10 +1,5 @@
 bootstrapPage(
-  p(
-    "This is from commit ",
-    shinycaas::buildtime_sha,
-    " build at ",
-    Sys.time()
-  ),
+  p("This was build at", Sys.time(), "."),
   selectInput(
     inputId = "n_breaks",
     label = "Number of bins in histogram (approximate):",
