@@ -3,4 +3,5 @@
 export(az_webapp_config)
 export(az_webapp_shiny_opts)
 export(include_app2)
+export(is_github_actions)
 export(runOldFaithful)

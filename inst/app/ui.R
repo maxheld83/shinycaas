@@ -1,4 +1,10 @@
 bootstrapPage(
+  p(
+    "This is from commit ",
+    Sys.getenv("GITHUB_SHA"),
+    " build at ",
+    Sys.time()
+  ),
   selectInput(
     inputId = "n_breaks",
     label = "Number of bins in histogram (approximate):",
