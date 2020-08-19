@@ -110,19 +110,22 @@ az_webapp_config(
   subscription = subscription
 )
 
-# deploy shiny app using muggle image
-# for an easier way to set these arguments, see the {muggle} package
-az_webapp_config(
-  name = "old-faithful",
-  deployment_container_image_name = paste0(
-    "docker.pkg.github.com/subugoe/shinycaas/oldfaithful", ":",
-    ifelse(Sys.getenv("GITHUB_SHA") == "", "latest", Sys.getenv("GITHUB_SHA"))
-  ),
-  plan = plan,
-  resource_group = resource_group,
-  subscription = subscription,
-  docker_registry_server_url = "https://docker.pkg.github.com",
-  docker_registry_server_user = "maxheld83"
-  # docker password is a GITHUB PAT, pasted directly into portal.azure.com
-)
+# below env vars and secrets are only available on github actions
+if (is_github_actions()) {
+  # deploy shiny app using muggle image
+  # for an easier way to set these arguments, see the {muggle} package
+  az_webapp_config(
+    name = "old-faithful",
+    deployment_container_image_name = paste0(
+      "docker.pkg.github.com/subugoe/shinycaas/oldfaithful", ":",
+      ifelse(is_github_actions(), Sys.getenv("GITHUB_SHA"), "latest")
+    ),
+    plan = plan,
+    resource_group = resource_group,
+    subscription = subscription,
+    docker_registry_server_url = "https://docker.pkg.github.com",
+    docker_registry_server_user = Sys.getenv("GITHUB_ACTOR"),
+    docker_registry_server_password = Sys.getenv("GITHUB_TOKEN")
+  )
+}
 }

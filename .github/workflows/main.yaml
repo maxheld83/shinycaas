@@ -22,7 +22,9 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       - name: Install System Dependencies
-        run: muggle::install_sysdeps()
+        run: |
+          cat(Sys.getenv("GITHUB_TOKEN"))
+          muggle::install_sysdeps()
       - name: Install R Dependencies
         env:
           # see builder.Dockerfile for explanation, this resets after this step
