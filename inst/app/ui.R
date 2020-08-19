@@ -1,7 +1,7 @@
 bootstrapPage(
   p(
     "This is from commit ",
-    Sys.getenv("GITHUB_SHA"),
+    shinycaas::buildtime_sha,
     " build at ",
     Sys.time()
   ),
