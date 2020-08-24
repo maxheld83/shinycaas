@@ -2,8 +2,6 @@ on: push
 
 jobs:
   CICD:
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     runs-on: ubuntu-20.04
     defaults:
       run:
@@ -11,6 +9,9 @@ jobs:
     container:
       # this needs to be the same as in Dockerfile
       image: subugoe/muggle-buildtime-onbuild:a94fcb785886af96d440b4bcd7f47c01162d7f5e
+    env:
+      MUGGLE_PKG_NAME: ${{ github.event.repository.name }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - name: Cache R Packages
@@ -19,14 +20,8 @@ jobs:
           # only cache the user library
           path: ".github/library"
           key: ${{ job.container.image }}-${{ hashFiles('DESCRIPTION') }}
-      - name: Log in to Azure
-        uses: azure/login@v1.1
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
       - name: Install System Dependencies
-        run: |
-          cat(Sys.getenv("GITHUB_TOKEN"))
-          muggle::install_sysdeps()
+        run: muggle::install_sysdeps()
       - name: Install R Dependencies
         env:
           # see builder.Dockerfile for explanation, this resets after this step
@@ -49,6 +44,10 @@ jobs:
           tags: ${{ github.sha }}
           add_git_labels: true
           push: ${{ github.event_name != 'pull_request' }}
+      - name: Log in to Azure
+        uses: azure/login@v1.1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
       - name: Check
         run: muggle::rcmdcheck2()
       - name: Test Coverage
@@ -58,7 +57,7 @@ jobs:
       - uses: docker/build-push-action@v1
         name: Build Buildtime Image
         with:
-          repository: ${{ github.repository }}/shinycaas-buildtime
+          repository: ${{ github.repository }}/${{ env.MUGGLE_PKG_NAME }}-buildtime
           target: buildtime
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
@@ -75,4 +74,3 @@ jobs:
         uses: maxheld83/ghpages@github-token
         env:
           BUILD_DIR: docs
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
