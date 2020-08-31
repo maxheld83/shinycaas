@@ -15,6 +15,7 @@ az_webapp_config(
   docker_registry_server_url = NULL,
   docker_registry_server_user = NULL,
   docker_registry_server_password = NULL,
+  slot = NULL,
   restart = FALSE
 )
 
@@ -63,6 +64,10 @@ Defaults to \code{NULL}, in which case the azure default, \href{http://hub.docke
 Defaults to \code{NULL} for public registries.
 Do not expose your credentials in public code; it's best to use secret environment variables.}
 
+\item{slot}{The name of the \href{https://docs.microsoft.com/en-us/azure/app-service/deploy-staging-slots}{deployment slot}.
+Defaults to the production slot if not specified.
+Only available for higher app service plan tiers.}
+
 \item{restart}{whether to restart the web app.}
 }
 \description{
@@ -109,6 +114,30 @@ az_webapp_config(
   resource_group = resource_group,
   subscription = subscription
 )
+
+# deploy shiny app to slot
+az_webapp_config(
+  name = "hello-shiny",
+  # this image actually includes *more* than necessary
+  # for example, it includes shinyserver, but just shiny would suffice
+  deployment_container_image_name = "rocker/shiny:4.0.2",
+  # above image has no `ENTRYPOINT` and/or `CMD` to start shiny by default.
+  # so this `[COMMAND]` must be appended to `docker run`
+  startup_file = paste(
+    "Rscript",
+    # setting shiny options for azure manually
+    # equivalent to running shinycaas::az_webapp_shiny_opts()
+    "-e options(shiny.host='0.0.0.0',shiny.port=as.integer(Sys.getenv('PORT')))",
+    # remove getOption call https://github.com/subugoe/shinycaas/issues/37
+    "-e shiny::runExample('04_mpg',port=getOption('shiny.port'))"
+  ),
+  # replace below with your own credentials
+  plan = plan,
+  resource_group = resource_group,
+  subscription = subscription,
+  slot = "mpg"
+)
+
 
 # below env vars and secrets are only available on github actions
 if (is_github_actions()) {

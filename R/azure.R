@@ -46,6 +46,11 @@
 #' Defaults to `NULL` for public registries.
 #' Do not expose your credentials in public code; it's best to use secret environment variables.
 #'
+#' @param slot
+#' The name of the [deployment slot](https://docs.microsoft.com/en-us/azure/app-service/deploy-staging-slots).
+#' Defaults to the production slot if not specified.
+#' Only available for higher app service plan tiers.
+#'
 #' @param restart whether to restart the web app.
 #'
 #' @example tests/testthat/setup-azure.R
@@ -60,12 +65,14 @@ az_webapp_config <- function(name,
                              docker_registry_server_url = NULL,
                              docker_registry_server_user = NULL,
                              docker_registry_server_password = NULL,
+                             slot = NULL,
                              restart = FALSE) {
   checkmate::assert_string(name)
   checkmate::assert_string(deployment_container_image_name)
   checkmate::assert_string(startup_file, null.ok = TRUE)
   checkmate::assert_string(subscription)
   checkmate::assert_string(resource_group)
+  checkmate::assert_string(slot, null.ok = TRUE)
   checkmate::assert_string(docker_registry_server_url, null.ok = TRUE)
   checkmate::assert_string(docker_registry_server_user, null.ok = TRUE)
   checkmate::assert_string(docker_registry_server_password, null.ok = TRUE)
@@ -104,6 +111,15 @@ az_webapp_config <- function(name,
     # todo also pass on tags #25
   ))
 
+  # create deployment slot
+  if (!is.null(slot)) {
+    az_cli_run(args = c(
+      "webapp", "deployment", "slot", "create",
+      "--name", name,
+      "--slot", slot
+    ))
+  }
+
   cli::cli_alert_info("Setting web app container settings")
   az_cli_run(args = c(
     "webapp", "config", "container", "set",
@@ -118,6 +134,9 @@ az_webapp_config <- function(name,
     },
     if (!is.null(docker_registry_server_password)) {
       c("--docker-registry-server-password", docker_registry_server_password)
+    },
+    if (!is.null(slot)) {
+      c("--slot", slot)
     }
   ))
 
@@ -126,7 +145,10 @@ az_webapp_config <- function(name,
   az_cli_run(args = c(
     "webapp", "update",
     "--client-affinity-enabled", "true", # send traffic to same machine
-    "--https-only", "true"
+    "--https-only", "true",
+    if (!is.null(slot)) {
+      c("--slot", slot)
+    }
   ))
 
   cli::cli_alert_info("Setting web app configuration ...")
@@ -136,19 +158,28 @@ az_webapp_config <- function(name,
     "--ftps-state", "disabled", # not needed
     "--web-sockets-enabled", "true", # needed to serve shiny
     "--http20-enabled", "true",
-    "--min-tls-version", "1.2"
+    "--min-tls-version", "1.2",
+    if (!is.null(slot)) {
+      c("--slot", slot)
+    }
   ))
 
   # weirdly this cannot be set in the above
   az_cli_run(args = c(
     "webapp", "config", "appsettings", "set",
-    "--settings", "DOCKER_ENABLE_CI=false"
+    "--settings", "DOCKER_ENABLE_CI=false",
+    if (!is.null(slot)) {
+      c("--slot", slot)
+    }
   ))
 
   cli::cli_alert_info("Restaring web app ...")
   if (restart) {
     az_cli_run(args = c(
-      "webapp", "restart"
+      "webapp", "restart",
+      if (!is.null(slot)) {
+        c("--slot", slot)
+      }
     ))
   }
 
