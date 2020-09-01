@@ -29,7 +29,7 @@ library(shinycaas)
 
 ## System Requirements
 
-This package calls the [Microsoft Azure}(https://azure.microsoft.com/) Command-Line Interface (CLI).
+This package calls the [Microsoft Azure](https://azure.microsoft.com/) Command-Line Interface (CLI).
 To deploy to Azure, you need to [install the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) any machine from which you want to deploy your shiny app.
 There's no need to install the Azure CLI into your *production* image; you only need it at deploy time.
 If you only deploy from GitHub Actions (recommended) you do not need to install anything; the Azure CLI is [included](https://docs.github.com/en/actions/reference/software-installed-on-github-hosted-runners) in all GitHub-hosted runners.

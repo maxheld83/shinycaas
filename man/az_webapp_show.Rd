@@ -4,7 +4,14 @@
 \alias{az_webapp_show}
 \title{Get details of a web app}
 \usage{
-az_webapp_show(name, resource_group, slot = NULL, subscription, ...)
+az_webapp_show(...)
+}
+\arguments{
+\item{...}{
+  Arguments passed on to \code{\link[=az_webapp]{az_webapp}}
+  \describe{
+    \item{\code{restart}}{whether to restart the web app.}
+  }}
 }
 \description{
 Get details of a web app

@@ -1,4 +1,4 @@
-#' Deploy a shiny app to [Microsoft Azure Web Apps for Containers](https://azure.microsoft.com/en-us/services/app-service/containers/)
+#' Deploy a shiny app to Azure
 #'
 #' Calls the [Azure Command-Line Interface (CLI)](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest) with defaults suitable for deploying a shiny app.
 #' Wraps several steps.
@@ -249,7 +249,7 @@ az_cli_run <- function(...) {
   )
 }
 
-#' Shiny options for Microsoft Azure Web App for Containers
+#' Shiny options for Azure
 #'
 #' Set shiny options as [required for an Azure Webapp](https://docs.microsoft.com/en-us/azure/app-service/containers/configure-custom-container):
 #' - `options(shiny.port = as.integer(Sys.getenv('PORT'))`.
@@ -284,16 +284,19 @@ az_webapp_shiny_opts <- function() {
 
 #' Get details of a web app
 #'
+#' @inheritParams az_webapp
+#' @inheritDotParams az_webapp
+#'
 #' @family azure functions
 #'
 #' @export
-az_webapp_show <- function(name, resource_group, slot = NULL, subscription, ...) {
+az_webapp_show <- function(...) {
   res <- az_cli_run(args = c(
     "webapp", "show"
   ))
 }
 
-#' Embed a shiny app with Microsoft Azure Web Apps for Containers
+#' Embed a shiny app hosted on Azure
 #'
 #' @inheritDotParams include_app2
 #'

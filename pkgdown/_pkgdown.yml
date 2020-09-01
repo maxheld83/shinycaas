@@ -15,7 +15,8 @@ reference:
   - contents:
       - has_concept("helper functions")
   - title: Azure
-    desc: Deploy a Shiny App to Microsoft Azure Web Apps for Containers
+    desc: >
+      Deploy a Shiny App to [Microsoft Azure Web Apps for Containers](https://azure.microsoft.com/en-us/services/app-service/containers/)
   - contents:
       - has_concept("azure functions")
 articles:

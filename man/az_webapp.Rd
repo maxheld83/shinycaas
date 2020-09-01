@@ -11,7 +11,7 @@
 \alias{az_webapp_config_set}
 \alias{az_webapp_config_appsettings_set}
 \alias{az_webapp_restart}
-\title{Deploy a shiny app to \href{https://azure.microsoft.com/en-us/services/app-service/containers/}{Microsoft Azure Web Apps for Containers}}
+\title{Deploy a shiny app to Azure}
 \usage{
 az_webapp(restart = FALSE, ...)
 

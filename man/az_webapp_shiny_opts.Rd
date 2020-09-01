@@ -2,7 +2,7 @@
 % Please edit documentation in R/azure.R
 \name{az_webapp_shiny_opts}
 \alias{az_webapp_shiny_opts}
-\title{Shiny options for Microsoft Azure Web App for Containers}
+\title{Shiny options for Azure}
 \usage{
 az_webapp_shiny_opts()
 }

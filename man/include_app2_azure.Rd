@@ -2,7 +2,7 @@
 % Please edit documentation in R/azure.R
 \name{include_app2_azure}
 \alias{include_app2_azure}
-\title{Embed a shiny app with Microsoft Azure Web Apps for Containers}
+\title{Embed a shiny app hosted on Azure}
 \usage{
 include_app2_azure(slot = NULL, ...)
 }
@@ -21,7 +21,7 @@ Only available for higher app service plan tiers.}
   }}
 }
 \description{
-Embed a shiny app with Microsoft Azure Web Apps for Containers
+Embed a shiny app hosted on Azure
 }
 \seealso{
 Other azure functions: 
