@@ -10,6 +10,14 @@ template:
     docsearch:
       api_key: 9072907c558101ad82df2ee43f4618e9
       index_name: shinycaas
+reference:
+  - title: Helpers
+  - contents:
+      - has_concept("helper functions")
+  - title: Azure
+    desc: Deploy a Shiny App to Microsoft Azure Web Apps for Containers
+  - contents:
+      - has_concept("azure functions")
 articles:
   - title: Example Apps
     navbar: Example Apps

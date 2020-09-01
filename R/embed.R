@@ -9,6 +9,8 @@
 #'
 #' @return A tag list as from [htmltools::tagList()].
 #'
+#' @family helper functions
+#'
 #' @export
 include_app2 <- function(src, name = NULL, height = "100%", width = "100%") {
   htmltools::tags$div(

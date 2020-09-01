@@ -5,7 +5,7 @@ resource_group <- "hoad"
 subscription <- "f0dd3a37-0a4e-4e7f-9c9b-cb9f60146edc"
 
 # deploy shiny app using rocker image
-az_webapp_config(
+az_webapp(
   name = "hello-shiny",
   # this image actually includes *more* than necessary
   # for example, it includes shinyserver, but just shiny would suffice
@@ -27,7 +27,7 @@ az_webapp_config(
 )
 
 # deploy shiny app to slot
-az_webapp_config(
+az_webapp(
   name = "hello-shiny",
   # this image actually includes *more* than necessary
   # for example, it includes shinyserver, but just shiny would suffice
@@ -49,12 +49,11 @@ az_webapp_config(
   slot = "mpg"
 )
 
-
 # below env vars and secrets are only available on github actions
 if (is_github_actions()) {
   # deploy shiny app using muggle image
   # for an easier way to set these arguments, see the {muggle} package
-  az_webapp_config(
+  az_webapp(
     name = "old-faithful",
     deployment_container_image_name = paste0(
       "docker.pkg.github.com/subugoe/shinycaas/oldfaithful", ":",

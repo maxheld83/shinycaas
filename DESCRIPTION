@@ -28,7 +28,6 @@ Imports:
     checkmate (>= 2.0.0),
     withr (>= 2.2.0),
     fs (>= 1.4.0),
-    usethis (>= 1.6.1),
     htmltools (>= 0.5.0)
 Remotes:
   subugoe/subugoetheme@1.0.0

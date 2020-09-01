@@ -20,3 +20,4 @@ A tag list as from \code{\link[htmltools:tag]{htmltools::tagList()}}.
 Embeds a shiny app in a pkgdown, or similar bootstrap website.
 Does not offer a print method for non-html output.
 }
+\concept{helper functions}
