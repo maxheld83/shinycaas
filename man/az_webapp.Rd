@@ -2,32 +2,38 @@
 % Please edit documentation in R/azure.R
 \name{az_webapp}
 \alias{az_webapp}
-\alias{az_account_set}
-\alias{az_configure}
 \alias{az_webapp_create}
+\alias{az_webapp_delete}
+\alias{az_webapp_list}
+\alias{az_webapp_show}
 \alias{az_webapp_deployment_slot_create}
 \alias{az_webapp_config_container_set}
 \alias{az_webapp_update}
 \alias{az_webapp_config_set}
+\alias{az_webapp_config_container_show}
 \alias{az_webapp_config_appsettings_set}
 \alias{az_webapp_restart}
-\title{Deploy a shiny app to Azure}
+\title{Manage web apps}
 \usage{
-az_webapp(restart = FALSE, ...)
-
-az_account_set(subscription, ...)
-
-az_configure(name, resource_group, ...)
+az_webapp(slot = NULL, restart = TRUE, ...)
 
 az_webapp_create(
+  name = NULL,
   plan,
-  name,
-  startup_file = NULL,
+  resource_group = NULL,
   deployment_container_image_name,
+  startup_file = NULL,
+  subscription = NULL,
   ...
 )
 
-az_webapp_deployment_slot_create(name, slot = NULL, ...)
+az_webapp_delete(name = NULL, slot = NULL, ...)
+
+az_webapp_list(...)
+
+az_webapp_show(slot = NULL, ...)
+
+az_webapp_deployment_slot_create(name = NULL, resource_group = NULL, slot, ...)
 
 az_webapp_config_container_set(
   deployment_container_image_name,
@@ -42,24 +48,51 @@ az_webapp_update(slot = NULL, ...)
 
 az_webapp_config_set(slot = NULL, ...)
 
+az_webapp_config_container_show(slot = NULL, ...)
+
 az_webapp_config_appsettings_set(slot = NULL, ...)
 
 az_webapp_restart(slot = NULL, ...)
 }
 \arguments{
+\item{slot}{The name of the \href{https://docs.microsoft.com/en-us/azure/app-service/deploy-staging-slots}{deployment slot}.
+Defaults to the production slot if not specified.
+Only available for higher app service plan tiers.}
+
 \item{restart}{whether to restart the web app.}
 
-\item{\dots}{passed on to other functions or placeholder.}
+\item{...}{
+  Arguments passed on to \code{\link[=az_cli_run]{az_cli_run}}, \code{\link[=az_cli_run]{az_cli_run}}
+  \describe{
+    \item{\code{cmd}}{Command, required, optional, additional parameters, as for \code{\link[processx:run]{processx::run()}}
+\code{add} parameters are reserved for the user to pass down additional arguments.}
+    \item{\code{req}}{Command, required, optional, additional parameters, as for \code{\link[processx:run]{processx::run()}}
+\code{add} parameters are reserved for the user to pass down additional arguments.}
+    \item{\code{opt}}{Command, required, optional, additional parameters, as for \code{\link[processx:run]{processx::run()}}
+\code{add} parameters are reserved for the user to pass down additional arguments.}
+    \item{\code{add}}{Command, required, optional, additional parameters, as for \code{\link[processx:run]{processx::run()}}
+\code{add} parameters are reserved for the user to pass down additional arguments.}
+    \item{\code{echo_cmd}}{Whether to print the command to run to the screen.}
+    \item{\code{echo}}{Whether to print the standard output and error
+to the screen. Note that the order of the standard output and error
+lines are not necessarily correct, as standard output is typically
+buffered.}
+  }}
 
-\item{subscription}{Name or ID of the Azure subscription to which costs are billed.
-According to an upvoted answer on Stack Overflow, \href{https://stackoverflow.com/questions/45661109/are-azure-subscription-id-aad-tenant-id-and-aad-app-client-id-considered-secre}{Azure subscription IDs need not be considered a secret or personal identifiable information (PII)}.
-However, depending your applicable context and policies, you may want to provide this argument as a secret.}
+\item{name}{Name of the web app.
+(In the Azure CLI, this argument is sometimes known as \code{name}, and sometimes as \code{web}).}
 
-\item{name}{Name of the web app.}
+\item{plan}{Name or resource id of the app service plan.}
 
 \item{resource_group}{The \href{https://docs.microsoft.com/en-us/azure/azure-resource-manager/management/manage-resource-groups-portal}{Azure resource group} to which the shiny app should belong.}
 
-\item{plan}{Name or resource id of the app service plan.}
+\item{deployment_container_image_name}{The custom image name and optionally the tag name.
+Image must
+\itemize{
+\item include everything needed to run the shiny app, including shiny itself,
+but \emph{does not} need to include shiny server or other software to route, load balance and serve shiny,
+\item include an \code{ENTRYPOINT} and/or \href{https://docs.docker.com/engine/reference/builder/#cmd}{\code{CMD}} instruction to start shiny automatically (recommended), \emph{or} shiny must be started via the \code{startup_file} argument.
+}}
 
 \item{startup_file}{\verb{docker run} \href{https://docs.docker.com/engine/reference/run/}{\verb{[COMMAND]}} to use inside of your custom image \code{deployment_container_image_name}.
 Defaults to \code{NULL}, in which case the container is expected to start up shiny automatically (recommended).
@@ -78,17 +111,11 @@ The following \code{startup-file}s are \emph{invalid}:
 \item \code{"Rscript -e '1+1'"} (quoting of \verb{[EXPR]} would be treated as \verb{"Rscript -e '\\"1+1\\"'"}).
 }}
 
-\item{deployment_container_image_name}{The custom image name and optionally the tag name.
-Image must
-\itemize{
-\item include everything needed to run the shiny app, including shiny itself,
-but \emph{does not} need to include shiny server or other software to route, load balance and serve shiny,
-\item include an \code{ENTRYPOINT} and/or \href{https://docs.docker.com/engine/reference/builder/#cmd}{\code{CMD}} instruction to start shiny automatically (recommended), \emph{or} shiny must be started via the \code{startup_file} argument.
-}}
+\item{subscription}{Name or ID of the Azure subscription to which costs are billed.
+According to an upvoted answer on Stack Overflow, \href{https://stackoverflow.com/questions/45661109/are-azure-subscription-id-aad-tenant-id-and-aad-app-client-id-considered-secre}{Azure subscription IDs need not be considered a secret or personal identifiable information (PII)}.
+However, depending your applicable context and policies, you may want to provide this argument as a secret.
 
-\item{slot}{The name of the \href{https://docs.microsoft.com/en-us/azure/app-service/deploy-staging-slots}{deployment slot}.
-Defaults to the production slot if not specified.
-Only available for higher app service plan tiers.}
+To find out which subscriptions you are currently authorised to use, run \code{print(az_account_list())}.}
 
 \item{docker_registry_server_url}{The container registry server url.
 Defaults to \code{NULL}, in which case the azure default, \href{http://hub.docker.com}{docker hub} is used.}
@@ -98,108 +125,41 @@ Defaults to \code{NULL} for public registries.
 Do not expose your credentials in public code; it's best to use secret environment variables.}
 }
 \description{
-Calls the \href{https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest}{Azure Command-Line Interface (CLI)} with defaults suitable for deploying a shiny app.
-Wraps several steps.
+Manage web apps
 }
 \section{Functions}{
 \itemize{
-\item \code{az_account_set}: Setting subscription
+\item \code{az_webapp_create}: Create a web app
 
-\item \code{az_configure}: Set defaults for az CLI.
-Does not leave side effects (\verb{.azure/}), but cleans up after itself.
-Must be called repeatedly.
-If a folder \code{.azure} is already in the working directory, those defaults are used and a warning is issued.
+\item \code{az_webapp_delete}: Delete a web app
 
-\item \code{az_webapp_create}: Creates a web app
+\item \code{az_webapp_list}: List web apps
 
-\item \code{az_webapp_deployment_slot_create}: Creates a deployment slot
+\item \code{az_webapp_show}: Gets the details of a web app
 
-\item \code{az_webapp_config_container_set}: Sets web app container settings
+\item \code{az_webapp_deployment_slot_create}: Create a deployment slot
 
-\item \code{az_webapp_update}: Sets web app tags
+\item \code{az_webapp_config_container_set}: Set a web app container's settings
 
-\item \code{az_webapp_config_set}: Sets web app configuration
+\item \code{az_webapp_update}: Update a web app
 
-\item \code{az_webapp_config_appsettings_set}: Sets web app appsetings
+\item \code{az_webapp_config_set}: Set a web app's configuration
+
+\item \code{az_webapp_config_container_show}: Get details of a web app container's settings
+
+\item \code{az_webapp_config_appsettings_set}: Set a web app's settings
 
 \item \code{az_webapp_restart}: Restarts the web app
 }}
 
-\examples{
-# hoad credentials used for testing
-# authentication happens outside of r, see github actions main.yaml
-plan <- "hoad"
-resource_group <- "hoad"
-subscription <- "f0dd3a37-0a4e-4e7f-9c9b-cb9f60146edc"
-
-# deploy shiny app using rocker image
-az_webapp(
-  name = "hello-shiny",
-  # this image actually includes *more* than necessary
-  # for example, it includes shinyserver, but just shiny would suffice
-  deployment_container_image_name = "rocker/shiny:4.0.2",
-  # above image has no `ENTRYPOINT` and/or `CMD` to start shiny by default.
-  # so this `[COMMAND]` must be appended to `docker run`
-  startup_file = paste(
-    "Rscript",
-    # setting shiny options for azure manually
-    # equivalent to running shinycaas::az_webapp_shiny_opts()
-    "-e options(shiny.host='0.0.0.0',shiny.port=as.integer(Sys.getenv('PORT')))",
-    # remove getOption call https://github.com/subugoe/shinycaas/issues/37
-    "-e shiny::runExample('01_hello',port=getOption('shiny.port'))"
-  ),
-  # replace below with your own credentials
-  plan = plan,
-  resource_group = resource_group,
-  subscription = subscription
-)
-
-# deploy shiny app to slot
-az_webapp(
-  name = "hello-shiny",
-  # this image actually includes *more* than necessary
-  # for example, it includes shinyserver, but just shiny would suffice
-  deployment_container_image_name = "rocker/shiny:4.0.2",
-  # above image has no `ENTRYPOINT` and/or `CMD` to start shiny by default.
-  # so this `[COMMAND]` must be appended to `docker run`
-  startup_file = paste(
-    "Rscript",
-    # setting shiny options for azure manually
-    # equivalent to running shinycaas::az_webapp_shiny_opts()
-    "-e options(shiny.host='0.0.0.0',shiny.port=as.integer(Sys.getenv('PORT')))",
-    # remove getOption call https://github.com/subugoe/shinycaas/issues/37
-    "-e shiny::runExample('04_mpg',port=getOption('shiny.port'))"
-  ),
-  # replace below with your own credentials
-  plan = plan,
-  resource_group = resource_group,
-  subscription = subscription,
-  slot = "mpg"
-)
-
-# below env vars and secrets are only available on github actions
-if (is_github_actions()) {
-  # deploy shiny app using muggle image
-  # for an easier way to set these arguments, see the {muggle} package
-  az_webapp(
-    name = "old-faithful",
-    deployment_container_image_name = paste0(
-      "docker.pkg.github.com/subugoe/shinycaas/oldfaithful", ":",
-      ifelse(is_github_actions(), Sys.getenv("GITHUB_SHA"), "latest")
-    ),
-    plan = plan,
-    resource_group = resource_group,
-    subscription = subscription,
-    docker_registry_server_url = "https://docker.pkg.github.com",
-    docker_registry_server_user = Sys.getenv("GITHUB_ACTOR"),
-    docker_registry_server_password = Sys.getenv("GITHUB_TOKEN")
-  )
-}
-}
 \seealso{
 Other azure functions: 
-\code{\link{az_webapp_shiny_opts}()},
-\code{\link{az_webapp_show}()},
-\code{\link{include_app2_azure}()}
+\code{\link{az_account}()},
+\code{\link{az_cli_run}()},
+\code{\link{az_configure}()},
+\code{\link{az_login}()},
+\code{\link{include_app2_az}()},
+\code{\link{shiny_deploy_az}()},
+\code{\link{shiny_opts_az}()}
 }
 \concept{azure functions}

@@ -10,3 +10,5 @@
 ^pkgdown$
 Dockerfile
 ^vignettes/
+^\.azure$
+man-roxygen

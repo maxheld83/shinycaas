@@ -2,66 +2,52 @@
 % Please edit documentation in R/azure.R
 \name{az_cli_run}
 \alias{az_cli_run}
-\title{Run Azure CLI}
+\title{Run Azure CLI
+Wraps the \href{https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest}{Azure Command-Line Interface (CLI)}.}
 \usage{
-az_cli_run(...)
+az_cli_run(
+  cmd,
+  req = NULL,
+  opt = NULL,
+  add = NULL,
+  echo_cmd = FALSE,
+  echo = FALSE,
+  ...
+)
 }
 \arguments{
-\item{...}{
-  Arguments passed on to \code{\link[processx:run]{processx::run}}
-  \describe{
-    \item{\code{command}}{Character scalar, the command to run.}
-    \item{\code{args}}{Character vector, arguments to the command.}
-    \item{\code{error_on_status}}{Whether to throw an error if the command returns
-with a non-zero status, or it is interrupted. The error classes are
-\code{system_command_status_error} and \code{system_command_timeout_error},
-respectively, and both errors have class \code{system_command_error} as
-well. See also "Error conditions" below.}
-    \item{\code{wd}}{Working directory of the process. If \code{NULL}, the current
-working directory is used.}
-    \item{\code{echo_cmd}}{Whether to print the command to run to the screen.}
-    \item{\code{echo}}{Whether to print the standard output and error
+\item{cmd, req, opt, add}{Command, required, optional, additional parameters, as for \code{\link[processx:run]{processx::run()}}
+\code{add} parameters are reserved for the user to pass down additional arguments.}
+
+\item{echo_cmd}{Whether to print the command to run to the screen.}
+
+\item{echo}{Whether to print the standard output and error
 to the screen. Note that the order of the standard output and error
 lines are not necessarily correct, as standard output is typically
 buffered.}
-    \item{\code{spinner}}{Whether to show a reassuring spinner while the process
-is running.}
-    \item{\code{timeout}}{Timeout for the process, in seconds, or as a \code{difftime}
-object. If it is not finished before this, it will be killed.}
-    \item{\code{stdout_line_callback}}{\code{NULL}, or a function to call for every
-line of the standard output. See \code{stdout_callback} and also more
-below.}
-    \item{\code{stdout_callback}}{\code{NULL}, or a function to call for every chunk
-of the standard output. A chunk can be as small as a single character.
-At most one of \code{stdout_line_callback} and \code{stdout_callback} can be
-non-\code{NULL}.}
-    \item{\code{stderr_line_callback}}{\code{NULL}, or a function to call for every
-line of the standard error. See \code{stderr_callback} and also more
-below.}
-    \item{\code{stderr_callback}}{\code{NULL}, or a function to call for every chunk
-of the standard error. A chunk can be as small as a single character.
-At most one of \code{stderr_line_callback} and \code{stderr_callback} can be
-non-\code{NULL}.}
-    \item{\code{stderr_to_stdout}}{Whether to redirect the standard error to the
-standard output. Specifying \code{TRUE} here will keep both in the
-standard output, correctly interleaved. However, it is not possible
-to deduce where pieces of the output were coming from. If this is
-\code{TRUE}, the standard error callbacks  (if any) are never called.}
-    \item{\code{env}}{Environment of the child process, a named character vector.
-IF \code{NULL}, the environment of the parent is inherited.}
-    \item{\code{windows_verbatim_args}}{Whether to omit the escaping of the
-command and the arguments on windows. Ignored on other platforms.}
-    \item{\code{windows_hide_window}}{Whether to hide the window of the
-application on windows. Ignored on other platforms.}
-    \item{\code{encoding}}{The encoding to assume for \code{stdout} and
-\code{stderr}. By default the encoding of the current locale is
-used. Note that \code{processx} always reencodes the output of
-both streams in UTF-8 currently.}
-    \item{\code{cleanup_tree}}{Whether to clean up the child process tree after
-the process has finished.}
-  }}
+
+\item{...}{Extra arguments are passed to \code{process$new()}, see
+\link[processx]{process}. Note that you cannot pass \code{stout} or \code{stderr} here,
+because they are used internally by \code{run()}. You can use the
+\code{stdout_callback}, \code{stderr_callback}, etc. arguments to manage
+the standard output and error, or the \link[processx]{process} class directly
+if you need more flexibility.}
+}
+\value{
+(invisible) \code{stdout} parsed through \code{\link[jsonlite:fromJSON]{jsonlite::fromJSON()}}
 }
 \description{
 Run Azure CLI
+Wraps the \href{https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest}{Azure Command-Line Interface (CLI)}.
 }
-\keyword{internal}
+\seealso{
+Other azure functions: 
+\code{\link{az_account}()},
+\code{\link{az_configure}()},
+\code{\link{az_login}()},
+\code{\link{az_webapp}()},
+\code{\link{include_app2_az}()},
+\code{\link{shiny_deploy_az}()},
+\code{\link{shiny_opts_az}()}
+}
+\concept{azure functions}

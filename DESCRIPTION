@@ -20,15 +20,16 @@ URL: https://subugoe.github.io/shinycaas, https://github.com/subugoe/shinycaas
 BugReports: https://github.com/subugoe/shinycaas/issues
 Suggests:
     testthat,
+    withr,
     shiny (>= 1.5.0),
-    subugoetheme
+    subugoetheme,
+    fs
 Imports:
     processx (>= 3.4.3),
     cli (>= 2.0.2),
     checkmate (>= 2.0.0),
-    withr (>= 2.2.0),
-    fs (>= 1.4.0),
-    htmltools (>= 0.5.0)
+    htmltools (>= 0.5.0),
+    jsonlite (>= 1.7.0)
 Remotes:
   subugoe/subugoetheme@1.0.0
 SystemRequirements:
