@@ -2,13 +2,18 @@ Package: shinycaas
 Title: Deploy shiny applications to container as a service (CaaS)
 Version: 0.0.0.9000
 Authors@R:
-    c(person(given = "Maximilian",
-             family = "Held",
-             role = c("aut", "cre"),
-             email = "info@maxheld.de",
-             comment = c(ORCID = "0000-0002-4703-5388")),
-      person(given = c(subugoe = "Göttingen State and University Library"),
-             role = c("cph", "fnd"))
+    c(
+      person(
+        given = "Maximilian",
+        family = "Held",
+        role = c("aut", "cre"),
+        email = "info@maxheld.de",
+        comment = c(ORCID = "0000-0002-4703-5388")
+      ),
+      person(
+        given = "Göttingen State and University Library",
+        role = c("cph", "fnd")
+      )
     )
 Description: Deploying shiny apps to container as a service (CaaS) products on public cloud vendors.
 License: MIT + file LICENSE
@@ -19,18 +24,14 @@ RoxygenNote: 7.1.1
 URL: https://subugoe.github.io/shinycaas, https://github.com/subugoe/shinycaas
 BugReports: https://github.com/subugoe/shinycaas/issues
 Suggests:
-    testthat,
-    withr,
+    testthat (>= 3.0.0),
     shiny (>= 1.5.0),
-    subugoetheme,
-    fs
+    subugoetheme
 Imports:
-    processx (>= 3.4.3),
-    cli (>= 2.0.2),
+    AzureAppService,
     checkmate (>= 2.0.0),
     htmltools (>= 0.5.0),
-    jsonlite (>= 1.7.0)
+    cli (>= 2.2.0)
 Remotes:
-  subugoe/subugoetheme@1.0.0
-SystemRequirements:
-  Azure CLI (>= 2.9) (https://docs.microsoft.com/en-us/cli/azure/install-azure-cli)
+  subugoe/subugoetheme@1.0.0,
+  subugoe/AzureAppService@fd3d0795ece511c4ffe054e774bf3784f226dbc4

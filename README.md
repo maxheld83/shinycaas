@@ -4,36 +4,11 @@
 <!-- badges: start -->
 [![Main](https://github.com/subugoe/shinycaas/workflows/.github/workflows/main.yaml/badge.svg)](https://github.com/subugoe/shinycaas/actions)
 [![Codecov test coverage](https://codecov.io/gh/subugoe/shinycaas/branch/master/graph/badge.svg)](https://codecov.io/gh/subugoe/shinycaas?branch=master)
-[![R build status](https://github.com/subugoe/shinycaas/workflows/R-CMD-check/badge.svg)](https://github.com/subugoe/shinycaas/actions)
+[![CRAN status](https://www.r-pkg.org/badges/version/shinycaas)](https://CRAN.R-project.org/package=shinycaas)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
 <!-- badges: end -->
 
-The goal of shinycaas is to ...
-
-## Installation
-
-You can install the released version of shinycaas from [CRAN](https://CRAN.R-project.org) with:
-
-``` r
-install.packages("shinycaas")
-```
-
-## Example
-
-This is a basic example which shows you how to solve a common problem:
-
-``` r
-library(shinycaas)
-## basic example code
-```
-
-## System Requirements
-
-This package calls the [Microsoft Azure](https://azure.microsoft.com/) Command-Line Interface (CLI).
-To deploy to Azure, you need to [install the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) any machine from which you want to deploy your shiny app.
-There's no need to install the Azure CLI into your *production* image; you only need it at deploy time.
-If you only deploy from GitHub Actions (recommended) you do not need to install anything; the Azure CLI is [included](https://docs.github.com/en/actions/reference/software-installed-on-github-hosted-runners) in all GitHub-hosted runners.
-
+The goal of shinycaas is to make it easy to deploy shiny apps to Container-as-a-Service (CaaS) products in the public cloud.
 
 ### Limitations of [shinyapps.io](https://www.shinyapps.io)
 

@@ -18,14 +18,4 @@ If your image suggests \code{EXPOSE}d ports, that may be respected by Azure (und
 \details{
 You can also set these options manually, see \code{\link[=az_webapp]{az_webapp()}}.
 }
-\seealso{
-Other azure functions: 
-\code{\link{az_account}()},
-\code{\link{az_cli_run}()},
-\code{\link{az_configure}()},
-\code{\link{az_login}()},
-\code{\link{az_webapp}()},
-\code{\link{include_app2_az}()},
-\code{\link{shiny_deploy_az}()}
-}
 \concept{azure functions}

@@ -1,4 +1,5 @@
 #' @keywords internal
+#' @importFrom AzureAppService az_webapp az_configure
 "_PACKAGE"
 
 # The following block is used by usethis to automatically manage

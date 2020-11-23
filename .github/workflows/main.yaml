@@ -8,7 +8,7 @@ jobs:
         shell: Rscript {0}
     container:
       # this needs to be the same as in Dockerfile
-      image: subugoe/muggle-buildtime-onbuild:a94fcb785886af96d440b4bcd7f47c01162d7f5e
+      image: subugoe/muggle-buildtime-onbuild:f7fb6146d8712c4bffb024f4d4f40c40ffab5598
     env:
       MUGGLE_PKG_NAME: ${{ github.event.repository.name }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -53,7 +53,7 @@ jobs:
       - name: Test Coverage
         run: covr::codecov()
       - name: Build Package Website
-        run: pkgdown::build_site(override = list(new_process = FALSE))
+        run: muggle::build_site2(new_process = FALSE)
       - uses: docker/build-push-action@v1
         name: Build Buildtime Image
         with:

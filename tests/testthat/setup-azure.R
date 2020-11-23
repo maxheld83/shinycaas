@@ -1,12 +1,23 @@
-# hoad credentials used for testing
-# authentication happens outside of r, see github actions main.yaml
-# during testing .azure/ is not available, so we have to set that here
+# login
+# the equivalent of (interactive) az_login is run outside of R
+
+# subscription
+# the azure login action automatically retrieves the enabled subscriptions GitHub Actions
+
+# resource group
+az_configure(resource_group = "hoad")
+# you can also pass this argument to shiny_deploy_az for the one-call deployment
+# you can also set this once and commit the resulting .azure/config
+# but this is not easily available during testing, so it's set from R here
+# because several apps are deployed below, `name` is set for each of them
+
+# plan
 plan <- "hoad"
-resource_group <- "hoad"
+# there's no way to set a plan default
 
 # deploy shiny app using rocker image
-shiny_deploy_az(
-  name = "hello-shiny",
+az_configure(name = "hello-shiny")
+az_webapp(
   # this image actually includes *more* than necessary
   # for example, it includes shinyserver, but just shiny would suffice
   deployment_container_image_name = "rocker/shiny:4.0.2",
@@ -20,29 +31,27 @@ shiny_deploy_az(
     # remove getOption call https://github.com/subugoe/shinycaas/issues/37
     "-e shiny::runExample('01_hello',port=getOption('shiny.port'))"
   ),
-  plan = plan,
-  resource_group = resource_group
+  plan = plan
 )
 
 # deploy shiny app to slot
-shiny_deploy_az(
-  name = "hello-shiny",
+az_webapp(
   deployment_container_image_name = "rocker/shiny:4.0.2",
   startup_file = paste(
     "Rscript",
     "-e options(shiny.host='0.0.0.0',shiny.port=as.integer(Sys.getenv('PORT')))",
-    "-e shiny::runExample('04_mpg',port=getOption('shiny.port'))"
+    "-e shiny::runExample('05_sliders',port=getOption('shiny.port'))"
   ),
   plan = plan,
-  slot = "mpg" # a more suitable slot name might be "dev" or "staging"
+  slot = "sliders" # a more suitable slot name might be "dev" or "staging"
 )
 
+# deploy shiny app using private image, here from muggle package
 # below env vars and secrets are only available on github actions
 if (is_github_actions()) {
-  # deploy shiny app using muggle image
   # for an easier way to set these arguments, see the {muggle} package
-  shiny_deploy_az(
-    name = "old-faithful",
+  az_configure(name = "old-faithful")
+  az_webapp(
     deployment_container_image_name = paste0(
       "docker.pkg.github.com/subugoe/shinycaas/oldfaithful", ":",
       ifelse(is_github_actions(), Sys.getenv("GITHUB_SHA"), "latest")
@@ -53,3 +62,6 @@ if (is_github_actions()) {
     docker_registry_server_password = Sys.getenv("GITHUB_TOKEN")
   )
 }
+
+# cleanup (necessary for testing)
+unlink(".azure", recursive = TRUE)
