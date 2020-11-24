@@ -50,6 +50,8 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
       - name: Check
         run: devtools::check()
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Test Coverage
         run: covr::codecov()
       - name: Build Package Website
