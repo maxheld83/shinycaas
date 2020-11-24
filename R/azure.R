@@ -20,19 +20,17 @@ AzureAppService::az_configure
 #'    If your image suggests `EXPOSE`d ports, that may be respected by Azure (undocumented behavior).
 #' - `options(shiny.host = "0.0.0.0")` to make your shiny application accessable to the Azure Webapp hosting environment.
 #'
-#' You can also set these options manually, see [az_webapp()].
-#'
 #' @family azure functions
 #'
 #' @export
 shiny_opts_az <- function() {
   port <- Sys.getenv("PORT")
   if (port == "") {
-    cli::cli_alert_warning(
-      "Could not find environment variable {cli::cli_code('PORT')}.",
-      "Perhaps this is running outside of Azure?",
-      "Reverting to shiny default."
-    )
+    cli::cli_alert_warning(c(
+      "Could not find environment variable {.envvar PORT}. ",
+      "Perhaps this is running outside of Azure? ",
+      "Reverting to shiny default. "
+    ))
     port <- NULL
   } else {
     port <- as.integer(port)

@@ -15,7 +15,4 @@ If your image suggests \code{EXPOSE}d ports, that may be respected by Azure (und
 \item \code{options(shiny.host = "0.0.0.0")} to make your shiny application accessable to the Azure Webapp hosting environment.
 }
 }
-\details{
-You can also set these options manually, see \code{\link[=az_webapp]{az_webapp()}}.
-}
 \concept{azure functions}
