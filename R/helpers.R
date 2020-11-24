@@ -10,7 +10,6 @@ is_github_actions <- function() {
   Sys.getenv("GITHUB_ACTIONS") == "true"
 }
 
-
 # TODO migrate to ghactions repo https://github.com/subugoe/shinycaas/issues/52
 #' Get GitHub Actions Environment Variables or Local Equivalent
 #'

@@ -33,5 +33,5 @@ Imports:
     htmltools (>= 0.5.0),
     cli (>= 2.2.0)
 Remotes:
-  subugoe/subugoetheme@1.0.0,
-  subugoe/AzureAppService@fd3d0795ece511c4ffe054e774bf3784f226dbc4
+  subugoe/subugoetheme@1.1.1,
+  subugoe/AzureAppService@1.0.0
