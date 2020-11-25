@@ -51,7 +51,7 @@ jobs:
       - name: Check
         run: devtools::check()
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_PAT_PKG: ${{ secrets.GH_PAT_PKG }}
       - name: Test Coverage
         run: covr::codecov()
       - name: Build Package Website

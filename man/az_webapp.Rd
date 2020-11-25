@@ -66,7 +66,7 @@ if (is_github_actions()) {
     plan = plan,
     docker_registry_server_url = "https://docker.pkg.github.com",
     docker_registry_server_user = Sys.getenv("GITHUB_ACTOR"),
-    docker_registry_server_password = Sys.getenv("GITHUB_TOKEN")
+    docker_registry_server_password = Sys.getenv("GH_PAT_PKG")
   )
 }
 
