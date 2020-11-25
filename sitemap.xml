@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://subugoe.github.io/shinycaas/index.html</loc>
+  </url>
+  <url>
+    <loc>https://subugoe.github.io/shinycaas/reference/az_configure.html</loc>
+  </url>
+  <url>
+    <loc>https://subugoe.github.io/shinycaas/reference/az_webapp.html</loc>
+  </url>
+  <url>
+    <loc>https://subugoe.github.io/shinycaas/reference/getenv2.html</loc>
+  </url>
+  <url>
+    <loc>https://subugoe.github.io/shinycaas/reference/include_app2.html</loc>
+  </url>
+  <url>
+    <loc>https://subugoe.github.io/shinycaas/reference/is_github_actions.html</loc>
+  </url>
+  <url>
+    <loc>https://subugoe.github.io/shinycaas/reference/runOldFaithful.html</loc>
+  </url>
+  <url>
+    <loc>https://subugoe.github.io/shinycaas/reference/shiny_opts_az.html</loc>
+  </url>
+  <url>
+    <loc>https://subugoe.github.io/shinycaas/reference/shinycaas-package.html</loc>
+  </url>
+  <url>
+    <loc>https://subugoe.github.io/shinycaas/articles/hello-shiny.html</loc>
+  </url>
+  <url>
+    <loc>https://subugoe.github.io/shinycaas/articles/old-faithful.html</loc>
+  </url>
+</urlset>

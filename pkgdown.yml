@@ -1,0 +1,11 @@
+pandoc: '2.5'
+pkgdown: 1.6.1
+pkgdown_sha: ~
+articles:
+  hello-shiny: hello-shiny.html
+  old-faithful: old-faithful.html
+last_built: 2020-11-25T16:13Z
+urls:
+  reference: https://subugoe.github.io/shinycaas/reference
+  article: https://subugoe.github.io/shinycaas/articles
+
